@@ -5,249 +5,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Practice Management - Enhanced</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="static/css/styles.css">
     <style>
-        /* Material Icons alignment */
-        .material-icons {
-            vertical-align: middle;
-        }
-        
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid rgba(59, 130, 246, 0.3);
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Tab transitions */
+        /* Tab content visibility */
         .tab-content {
             display: none;
         }
         
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        
-        /* Dark mode scrollbar */
-        .dark ::-webkit-scrollbar-thumb {
-            background: #4a5568;
-        }
-        
-        .dark ::-webkit-scrollbar-thumb:hover {
-            background: #718096;
-        }
-        
-        /* Smooth transitions for theme changes */
-        * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         
         /* Context menu */
         .context-menu {
             position: absolute;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             display: none;
-        }
-        
-        .dark .context-menu {
-            background: #1f2937;
-            border-color: #374151;
+            min-width: 180px;
         }
         
         .context-menu-item {
-            padding: 0.5rem 1rem;
+            padding: 12px 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 12px;
+            color: #e2e8f0;
+            font-size: 14px;
+            transition: all 0.2s ease;
         }
         
         .context-menu-item:hover {
-            background: #f3f4f6;
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
         }
         
-        .dark .context-menu-item:hover {
-            background: #374151;
+        .context-menu-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .context-menu-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(148, 163, 184, 0.1);
+            margin: 4px 0;
         }
     </style>
 </head>
-<body class="bg-blue-50 text-slate-800 font-sans" id="app-body">
+<body>
     <!-- Login Screen -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-blue-700 mb-2">Medical Practice Admin</h1>
-                <p class="text-gray-600">Secure Login</p>
+    <div id="login-screen" class="hidden">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Medical Practice Admin</h1>
+                <p>Secure Login</p>
             </div>
             
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <input type="text" id="username" placeholder="Username or Email" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <input type="password" id="password" placeholder="Password" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <button type="submit" id="login-btn" 
-                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium">
-                    Login
-                </button>
-                <div id="login-error" class="text-red-600 text-sm text-center hidden"></div>
+            <form id="login-form" class="login-form">
+                <input type="text" id="username" class="form-input" placeholder="Username or Email" required>
+                <input type="password" id="password" class="form-input" placeholder="Password" required>
+                <button type="submit" id="login-btn" class="login-btn">Login</button>
+                <div id="login-error" class="login-error hidden"></div>
             </form>
         </div>
     </div>
 
     <!-- Main Application -->
-    <div id="main-app" class="min-h-screen flex flex-col hidden">
+    <div id="main-app" class="fade-in">
         <!-- Header -->
-        <header class="bg-white shadow-md py-3 px-6 flex items-center justify-between border-b border-blue-200 dark:bg-slate-800 dark:border-slate-700">
-            <h1 class="text-xl font-semibold text-blue-700 dark:text-sky-400">Medical Practice Management - Enhanced</h1>
-            <div class="flex items-center space-x-4">
-                <button id="theme-toggle" class="flex items-center text-sm px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-md dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-sky-400">
-                    <span class="material-icons text-base mr-1" id="theme-icon">dark_mode</span>
-                    <span id="theme-text">Dark Theme</span>
+        <header class="app-header">
+            <h1 class="app-title">Medical Practice Management - Enhanced</h1>
+            <div class="header-controls">
+                <button id="theme-toggle" class="header-btn">
+                    <span class="material-icons" id="theme-icon">light_mode</span>
+                    <span id="theme-text">Light Theme</span>
                 </button>
-                <button id="user-menu-btn" class="flex items-center text-sm px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md dark:bg-sky-600 dark:hover:bg-sky-700">
-                    <span class="material-icons text-base mr-1">admin_panel_settings</span>
+                <button id="user-menu-btn" class="header-btn user-btn">
+                    <span class="material-icons">admin_panel_settings</span>
                     <span id="user-name">Admin</span>
                 </button>
             </div>
         </header>
 
         <!-- Toolbar -->
-        <div class="bg-blue-100 py-3 px-6 flex items-center justify-between border-b border-blue-200 dark:bg-slate-800 dark:border-slate-700">
-            <div class="flex items-center space-x-3">
-                <button id="refresh-btn" class="flex items-center text-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md dark:bg-sky-500 dark:hover:bg-sky-600">
-                    <span class="material-icons text-lg mr-2">refresh</span>
+        <div class="app-toolbar">
+            <div class="toolbar-left">
+                <button id="refresh-btn" class="toolbar-btn">
+                    <span class="material-icons">refresh</span>
                     Refresh
                 </button>
-                <button id="new-doctor-btn" class="flex items-center text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md dark:bg-sky-600 dark:hover:bg-sky-700">
-                    <span class="material-icons text-lg mr-2">add</span>
+                <button id="new-doctor-btn" class="toolbar-btn">
+                    <span class="material-icons">add</span>
                     New Doctor
                 </button>
-                <button id="export-btn" class="flex items-center text-sm px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300">
-                    <span class="material-icons text-lg mr-2">upload_file</span>
+                <button id="export-btn" class="toolbar-btn secondary">
+                    <span class="material-icons">upload_file</span>
                     Export
                 </button>
             </div>
-            <div class="relative">
-                <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-500">search</span>
-                <input id="global-search" class="bg-white border border-blue-300 rounded-md py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-72 text-slate-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:placeholder-slate-500" 
-                       placeholder="Global search... (Ctrl+F)" type="text">
+            <div class="search-container">
+                <span class="material-icons search-icon">search</span>
+                <input id="global-search" class="global-search" placeholder="Global search... (Ctrl+F)" type="text">
             </div>
         </div>
 
         <!-- Navigation Tabs -->
-        <nav class="bg-white px-6 flex border-b border-blue-200 dark:bg-slate-800 dark:border-slate-700">
-            <a href="#" data-tab="doctors" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 hover:text-blue-700 dark:text-sky-400 dark:border-sky-400 dark:hover:text-sky-300">
-                <span class="material-icons text-xl mr-2">person</span> Doctors
+        <nav class="nav-tabs">
+            <a href="#" data-tab="doctors" class="tab-link active">
+                <span class="material-icons">person</span>
+                Doctors
             </a>
-            <a href="#" data-tab="laboratories" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-sky-400">
-                <span class="material-icons text-xl mr-2">science</span> Laboratories
+            <a href="#" data-tab="laboratories" class="tab-link">
+                <span class="material-icons">science</span>
+                Laboratories
             </a>
-            <a href="#" data-tab="pharmacies" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-sky-400">
-                <span class="material-icons text-xl mr-2">local_pharmacy</span> Pharmacies
+            <a href="#" data-tab="pharmacies" class="tab-link">
+                <span class="material-icons">local_pharmacy</span>
+                Pharmacies
             </a>
-            <a href="#" data-tab="subscriptions" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-sky-400">
-                <span class="material-icons text-xl mr-2">subscriptions</span> Subscriptions
+            <a href="#" data-tab="subscriptions" class="tab-link">
+                <span class="material-icons">subscriptions</span>
+                Subscriptions
             </a>
-            <a href="#" data-tab="dashboard" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-sky-400">
-                <span class="material-icons text-xl mr-2">dashboard</span> Dashboard
+            <a href="#" data-tab="dashboard" class="tab-link">
+                <span class="material-icons">dashboard</span>
+                Dashboard
             </a>
-            <a href="#" data-tab="settings" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-sky-400">
-                <span class="material-icons text-xl mr-2">settings</span> Settings
+            <a href="#" data-tab="settings" class="tab-link">
+                <span class="material-icons">settings</span>
+                Settings
             </a>
         </nav>
 
         <!-- Main Content Area -->
-        <main class="flex-grow p-6 bg-blue-50 dark:bg-slate-900">
+        <main class="main-content">
             <!-- Doctors Tab -->
             <div id="doctors-tab" class="tab-content active">
-                <div class="bg-white rounded-lg shadow dark:bg-slate-800">
-                    <div class="px-6 py-4 flex items-center justify-between border-b border-blue-200 dark:border-slate-700">
-                        <div class="flex items-center space-x-3">
-                            <label class="flex items-center">
-                                <input type="checkbox" id="select-all-doctors" class="mr-2">
-                                <span class="text-sm">Select All</span>
-                            </label>
-                            <button id="bulk-actions-btn" class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md dark:bg-sky-600 dark:hover:bg-sky-700">
-                                Bulk Actions
-                            </button>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="relative">
-                                <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-base dark:text-slate-500">search</span>
-                                <input id="doctors-search" class="bg-blue-50 border border-blue-300 rounded-md py-2 pl-10 pr-3 text-sm w-48 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-slate-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300 dark:placeholder-slate-500" 
-                                       placeholder="Search..." type="text">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="control-group">
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="select-all-doctors" class="checkbox">
+                                <label for="select-all-doctors">Select All</label>
                             </div>
-                            <select id="doctors-search-field" class="bg-blue-50 border border-blue-300 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-slate-700 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300">
+                            <button id="bulk-actions-btn" class="btn-small">Bulk Actions</button>
+                        </div>
+                        <div class="card-controls">
+                            <div class="search-container">
+                                <input id="doctors-search" class="search-input" placeholder="Search..." type="text">
+                            </div>
+                            <select id="doctors-search-field" class="select-input">
                                 <option>All Fields</option>
                                 <option>Name</option>
                                 <option>Email</option>
                                 <option>ID</option>
                                 <option>Specialty</option>
                             </select>
-                            <button id="doctors-search-btn" class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md dark:bg-sky-600 dark:hover:bg-sky-700">
-                                Search
-                            </button>
-                            <button id="doctors-clear-btn" class="text-sm px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300">
-                                Clear
-                            </button>
+                            <button id="doctors-search-btn" class="btn-small">Search</button>
+                            <button id="doctors-clear-btn" class="btn-small secondary">Clear</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-slate-700 dark:text-slate-400">
-                            <thead class="bg-blue-100 text-xs uppercase text-blue-700 dark:bg-slate-700 dark:text-sky-400">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-4 py-3" scope="col"></th>
-                                    <th class="px-4 py-3" scope="col">ID</th>
-                                    <th class="px-4 py-3" scope="col">Name</th>
-                                    <th class="px-4 py-3" scope="col">Email</th>
-                                    <th class="px-4 py-3" scope="col">Status</th>
-                                    <th class="px-4 py-3" scope="col">Specialty</th>
-                                    <th class="px-4 py-3" scope="col">Phone</th>
-                                    <th class="px-4 py-3" scope="col">Pharmacy</th>
-                                    <th class="px-4 py-3" scope="col">Laboratory</th>
-                                    <th class="px-4 py-3" scope="col">Subscription</th>
-                                    <th class="px-4 py-3" scope="col">Days Left</th>
+                                    <th></th>
+                                    <th>ID</th>
+                                    <th>NAME</th>
+                                    <th>EMAIL</th>
+                                    <th>STATUS</th>
+                                    <th>SPECIALTY</th>
+                                    <th>PHONE</th>
+                                    <th>PHARMACY</th>
+                                    <th>LABORATORY</th>
+                                    <th>SUBSCRIPTION</th>
+                                    <th>DAYS LEFT</th>
                                 </tr>
                             </thead>
                             <tbody id="doctors-table-body">
@@ -260,21 +200,21 @@
 
             <!-- Laboratories Tab -->
             <div id="laboratories-tab" class="tab-content">
-                <div class="bg-white rounded-lg shadow dark:bg-slate-800">
-                    <div class="px-6 py-4 border-b border-blue-200 dark:border-slate-700">
-                        <h2 class="text-lg font-semibold">Laboratories</h2>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Laboratories</h2>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-slate-700 dark:text-slate-400">
-                            <thead class="bg-blue-100 text-xs uppercase text-blue-700 dark:bg-slate-700 dark:text-sky-400">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-4 py-3" scope="col">ID</th>
-                                    <th class="px-4 py-3" scope="col">Name</th>
-                                    <th class="px-4 py-3" scope="col">Doctor ID</th>
-                                    <th class="px-4 py-3" scope="col">Doctor Name</th>
-                                    <th class="px-4 py-3" scope="col">Status</th>
-                                    <th class="px-4 py-3" scope="col">Access Code</th>
-                                    <th class="px-4 py-3" scope="col">Created</th>
+                                    <th>ID</th>
+                                    <th>NAME</th>
+                                    <th>DOCTOR ID</th>
+                                    <th>DOCTOR NAME</th>
+                                    <th>STATUS</th>
+                                    <th>ACCESS CODE</th>
+                                    <th>CREATED</th>
                                 </tr>
                             </thead>
                             <tbody id="labs-table-body">
@@ -287,21 +227,21 @@
 
             <!-- Pharmacies Tab -->
             <div id="pharmacies-tab" class="tab-content">
-                <div class="bg-white rounded-lg shadow dark:bg-slate-800">
-                    <div class="px-6 py-4 border-b border-blue-200 dark:border-slate-700">
-                        <h2 class="text-lg font-semibold">Pharmacies</h2>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Pharmacies</h2>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-slate-700 dark:text-slate-400">
-                            <thead class="bg-blue-100 text-xs uppercase text-blue-700 dark:bg-slate-700 dark:text-sky-400">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-4 py-3" scope="col">ID</th>
-                                    <th class="px-4 py-3" scope="col">Name</th>
-                                    <th class="px-4 py-3" scope="col">Doctor ID</th>
-                                    <th class="px-4 py-3" scope="col">Doctor Name</th>
-                                    <th class="px-4 py-3" scope="col">Status</th>
-                                    <th class="px-4 py-3" scope="col">Access Code</th>
-                                    <th class="px-4 py-3" scope="col">Created</th>
+                                    <th>ID</th>
+                                    <th>NAME</th>
+                                    <th>DOCTOR ID</th>
+                                    <th>DOCTOR NAME</th>
+                                    <th>STATUS</th>
+                                    <th>ACCESS CODE</th>
+                                    <th>CREATED</th>
                                 </tr>
                             </thead>
                             <tbody id="pharmacies-table-body">
@@ -314,26 +254,26 @@
 
             <!-- Subscriptions Tab -->
             <div id="subscriptions-tab" class="tab-content">
-                <div class="bg-white rounded-lg shadow dark:bg-slate-800">
-                    <div class="px-6 py-4 flex items-center justify-between border-b border-blue-200 dark:border-slate-700">
-                        <div class="flex items-center space-x-3">
-                            <button id="filter-all" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm">All</button>
-                            <button id="filter-active" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Active</button>
-                            <button id="filter-expiring" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Expiring Soon</button>
-                            <button id="filter-expired" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600">Expired</button>
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="control-group">
+                            <button id="filter-all" class="btn-small">All</button>
+                            <button id="filter-active" class="btn-small secondary">Active</button>
+                            <button id="filter-expiring" class="btn-small secondary">Expiring Soon</button>
+                            <button id="filter-expired" class="btn-small secondary">Expired</button>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-slate-700 dark:text-slate-400">
-                            <thead class="bg-blue-100 text-xs uppercase text-blue-700 dark:bg-slate-700 dark:text-sky-400">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <th class="px-4 py-3" scope="col">ID</th>
-                                    <th class="px-4 py-3" scope="col">Name</th>
-                                    <th class="px-4 py-3" scope="col">Email</th>
-                                    <th class="px-4 py-3" scope="col">Start Date</th>
-                                    <th class="px-4 py-3" scope="col">End Date</th>
-                                    <th class="px-4 py-3" scope="col">Days Left</th>
-                                    <th class="px-4 py-3" scope="col">Status</th>
+                                    <th>ID</th>
+                                    <th>NAME</th>
+                                    <th>EMAIL</th>
+                                    <th>START DATE</th>
+                                    <th>END DATE</th>
+                                    <th>DAYS LEFT</th>
+                                    <th>STATUS</th>
                                 </tr>
                             </thead>
                             <tbody id="subscriptions-table-body">
@@ -346,69 +286,79 @@
 
             <!-- Dashboard Tab -->
             <div id="dashboard-tab" class="tab-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="stats-grid">
                     <!-- Stats Cards -->
-                    <div class="bg-white rounded-lg shadow p-6 border-2 border-blue-500 dark:bg-slate-800 dark:border-sky-500">
-                        <h3 class="text-blue-600 font-semibold text-sm mb-2 dark:text-sky-400">Total Doctors</h3>
-                        <p class="text-3xl font-bold text-blue-600 dark:text-sky-400" id="total-doctors">0</p>
-                        <p class="text-gray-500 text-sm dark:text-slate-400">Registered</p>
+                    <div class="stat-card primary">
+                        <div class="stat-header">Total Doctors</div>
+                        <div class="stat-value" id="total-doctors">0</div>
+                        <div class="stat-label">Registered</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow p-6 border-2 border-green-500 dark:bg-slate-800">
-                        <h3 class="text-green-600 font-semibold text-sm mb-2">Active Subscriptions</h3>
-                        <p class="text-3xl font-bold text-green-600" id="active-subscriptions">0</p>
-                        <p class="text-gray-500 text-sm dark:text-slate-400">Current</p>
+                    <div class="stat-card success">
+                        <div class="stat-header">Active Subscriptions</div>
+                        <div class="stat-value" id="active-subscriptions">0</div>
+                        <div class="stat-label">Current</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow p-6 border-2 border-yellow-500 dark:bg-slate-800">
-                        <h3 class="text-yellow-600 font-semibold text-sm mb-2">Expiring Soon</h3>
-                        <p class="text-3xl font-bold text-yellow-600" id="expiring-soon">0</p>
-                        <p class="text-gray-500 text-sm dark:text-slate-400">Next 30 days</p>
+                    <div class="stat-card warning">
+                        <div class="stat-header">Expiring Soon</div>
+                        <div class="stat-value" id="expiring-soon">0</div>
+                        <div class="stat-label">Next 30 days</div>
                     </div>
-                    <div class="bg-white rounded-lg shadow p-6 border-2 border-red-500 dark:bg-slate-800">
-                        <h3 class="text-red-600 font-semibold text-sm mb-2">Expired</h3>
-                        <p class="text-3xl font-bold text-red-600" id="expired-subscriptions">0</p>
-                        <p class="text-gray-500 text-sm dark:text-slate-400">Total</p>
+                    <div class="stat-card danger">
+                        <div class="stat-header">Expired</div>
+                        <div class="stat-value" id="expired-subscriptions">0</div>
+                        <div class="stat-label">Total</div>
                     </div>
                 </div>
                 
                 <!-- Recent Activity -->
-                <div class="bg-white rounded-lg shadow p-6 dark:bg-slate-800">
-                    <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
-                    <div id="activity-log" class="space-y-2 text-sm text-gray-600 dark:text-slate-400">
-                        <!-- Activity items will be inserted here -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Recent Activity</h2>
+                    </div>
+                    <div class="p-4">
+                        <div id="activity-log">
+                            <!-- Activity items will be inserted here -->
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Settings Tab -->
             <div id="settings-tab" class="tab-content">
-                <div class="bg-white rounded-lg shadow p-6 dark:bg-slate-800">
-                    <h2 class="text-lg font-semibold mb-6">Settings</h2>
-                    
-                    <!-- Account Settings -->
-                    <div class="mb-8">
-                        <h3 class="text-md font-semibold mb-4">Account Settings</h3>
-                        <button id="change-password-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 dark:bg-sky-600 dark:hover:bg-sky-700">
-                            Change Password
-                        </button>
+                <div class="content-card">
+                    <div class="card-header">
+                        <h2>Settings</h2>
                     </div>
-                    
-                    <!-- Export Settings -->
-                    <div class="mb-8">
-                        <h3 class="text-md font-semibold mb-4">Data Management</h3>
-                        <button id="export-all-btn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
-                            Export All Data
-                        </button>
+                    <div class="p-4">
+                        <!-- Account Settings -->
+                        <div class="mb-4">
+                            <h3 style="color: #e2e8f0; margin-bottom: 16px;">Account Settings</h3>
+                            <button id="change-password-btn" class="toolbar-btn">
+                                Change Password
+                            </button>
+                        </div>
+                        
+                        <!-- Export Settings -->
+                        <div class="mb-4">
+                            <h3 style="color: #e2e8f0; margin-bottom: 16px;">Data Management</h3>
+                            <button id="export-all-btn" class="toolbar-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                                Export All Data
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white py-3 px-6 text-xs text-slate-500 flex items-center justify-between border-t border-blue-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700">
-            <div>
-                <span class="material-icons text-base text-green-500 mr-1">wifi</span> Connected
+        <footer class="app-footer">
+            <div class="footer-left">
+                <div class="status-indicator connected">
+                    <span class="material-icons" style="font-size: 16px;">wifi</span>
+                    <span>Connected</span>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="footer-right">
                 <span id="session-timer">Session: 30 min</span>
                 <span id="record-count">0 records</span>
             </div>
@@ -416,35 +366,35 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-8 text-center dark:bg-slate-800">
-            <div class="spinner mx-auto mb-4"></div>
-            <p class="text-gray-700 dark:text-slate-300" id="loading-text">Loading...</p>
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loading-text">Loading...</div>
         </div>
     </div>
 
     <!-- Context Menu -->
     <div id="context-menu" class="context-menu">
         <div class="context-menu-item" data-action="view">
-            <span class="material-icons text-base">visibility</span>
+            <span class="material-icons">visibility</span>
             View Details
         </div>
         <div class="context-menu-item" data-action="edit">
-            <span class="material-icons text-base">edit</span>
+            <span class="material-icons">edit</span>
             Edit
         </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+        <div class="context-menu-divider"></div>
         <div class="context-menu-item" data-action="reset-password">
-            <span class="material-icons text-base">key</span>
+            <span class="material-icons">key</span>
             Reset Password
         </div>
         <div class="context-menu-item" data-action="toggle-status">
-            <span class="material-icons text-base">toggle_on</span>
+            <span class="material-icons">toggle_on</span>
             Toggle Status
         </div>
-        <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+        <div class="context-menu-divider"></div>
         <div class="context-menu-item" data-action="export">
-            <span class="material-icons text-base">download</span>
+            <span class="material-icons">download</span>
             Export
         </div>
     </div>
@@ -452,6 +402,6 @@
     <!-- Modals will be inserted dynamically -->
     <div id="modal-container"></div>
 
-    <script src="app.js"></script>
+    <script src="static/js/app.js"></script>
 </body>
 </html>

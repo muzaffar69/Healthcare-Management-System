@@ -367,26 +367,31 @@ class MedicalPracticeApp {
         
         doctors.forEach(doctor => {
             const row = document.createElement('tr');
-            row.className = 'border-b border-blue-200 hover:bg-blue-50 dark:border-slate-700 dark:hover:bg-slate-700/50';
             row.dataset.doctorId = doctor.id;
             
             // Add context menu listener
             row.addEventListener('contextmenu', (e) => this.showContextMenu(e, doctor));
             
             row.innerHTML = `
-                <td class="px-4 py-3">
-                    <input type="checkbox" class="doctor-checkbox" data-id="${doctor.id}">
+                <td>
+                    <input type="checkbox" class="doctor-checkbox checkbox" data-id="${doctor.id}">
                 </td>
-                <td class="px-4 py-3 text-slate-600 dark:text-slate-500">${this.truncateId(doctor.id)}</td>
-                <td class="px-4 py-3">${doctor.name}</td>
-                <td class="px-4 py-3">${this.truncateEmail(doctor.email)}</td>
-                <td class="px-4 py-3">${this.renderStatusBadge(doctor.status)}</td>
-                <td class="px-4 py-3">${doctor.specialty || ''}</td>
-                <td class="px-4 py-3">${doctor.phone || ''}</td>
-                <td class="px-4 py-3">${this.renderAccountStatus(doctor.pharmacyStatus)}</td>
-                <td class="px-4 py-3">${doctor.labStatus === 'not_assigned' ? 'Not assigned' : this.renderAccountStatus(doctor.labStatus)}</td>
-                <td class="px-4 py-3">${this.formatSubscriptionDates(doctor.subscriptionStart, doctor.subscriptionEnd)}</td>
-                <td class="px-4 py-3">${doctor.daysLeft ?? 'N/A'}</td>
+                <td>
+                    <span class="id-display">${this.truncateId(doctor.id)}</span>
+                </td>
+                <td class="font-weight-medium">${doctor.name}</td>
+                <td>${this.truncateEmail(doctor.email)}</td>
+                <td>${this.renderStatusBadge(doctor.status)}</td>
+                <td>${doctor.specialty || ''}</td>
+                <td>${doctor.phone || ''}</td>
+                <td>${this.renderAccountStatus(doctor.pharmacyStatus)}</td>
+                <td>${doctor.labStatus === 'not_assigned' ? 'Not assigned' : this.renderAccountStatus(doctor.labStatus)}</td>
+                <td>
+                    <div style="font-size: 12px;">
+                        ${this.formatSubscriptionDates(doctor.subscriptionStart, doctor.subscriptionEnd)}
+                    </div>
+                </td>
+                <td class="font-mono">${doctor.daysLeft ?? 'N/A'}</td>
             `;
             
             tbody.appendChild(row);
@@ -401,23 +406,30 @@ class MedicalPracticeApp {
             });
         });
     }
-
+    
     renderLabsTable(labs) {
         const tbody = document.getElementById('labs-table-body');
         tbody.innerHTML = '';
         
         labs.forEach(lab => {
             const row = document.createElement('tr');
-            row.className = 'border-b border-blue-200 hover:bg-blue-50 dark:border-slate-700 dark:hover:bg-slate-700/50';
             
             row.innerHTML = `
-                <td class="px-4 py-3 text-slate-600 dark:text-slate-500">${this.truncateId(lab.id)}</td>
-                <td class="px-4 py-3">${lab.name}</td>
-                <td class="px-4 py-3 text-slate-600 dark:text-slate-500">${this.truncateId(lab.doctorId)}</td>
-                <td class="px-4 py-3">${lab.doctorName}</td>
-                <td class="px-4 py-3">${this.renderStatusBadge(lab.status)}</td>
-                <td class="px-4 py-3 font-mono">${lab.accessCode}</td>
-                <td class="px-4 py-3">${this.formatDate(lab.createdAt)}</td>
+                <td>
+                    <span class="id-display">${this.truncateId(lab.id)}</span>
+                </td>
+                <td class="font-weight-medium">${lab.name}</td>
+                <td>
+                    <span class="id-display">${this.truncateId(lab.doctorId)}</span>
+                </td>
+                <td>${lab.doctorName}</td>
+                <td>${this.renderStatusBadge(lab.status)}</td>
+                <td>
+                    <span class="font-mono" style="background: rgba(56, 189, 248, 0.1); padding: 4px 8px; border-radius: 4px; color: #38bdf8;">
+                        ${lab.accessCode}
+                    </span>
+                </td>
+                <td>${this.formatDate(lab.createdAt)}</td>
             `;
             
             tbody.appendChild(row);

@@ -15,6 +15,15 @@ class BaseManager:
     
     def __init__(self, azure_services):
         self.azure = azure_services
+        
+        
+    def __eq__(self, other):
+        """Override equality to prevent comparison issues with PyWebView"""
+        return id(self) == id(other)
+    
+    def __hash__(self):
+        """Override hash to prevent comparison issues with PyWebView"""
+        return id(self)
     
     def _format_datetime(self, dt_str: str) -> str:
         """Format datetime string for display."""

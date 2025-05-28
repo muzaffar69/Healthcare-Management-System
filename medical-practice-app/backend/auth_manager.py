@@ -35,6 +35,17 @@ class AdminCredentials:
         
         if not self.credentials:
             self._create_initial_credentials()
+            
+            
+            
+    def __eq__(self, other):
+        """Override equality to prevent comparison issues with PyWebView"""
+        return id(self) == id(other)
+    
+    def __hash__(self):
+        """Override hash to prevent comparison issues with PyWebView"""
+        return id(self)
+        
     
     def _load_credentials(self) -> Dict[str, Any]:
         """Load credentials from encrypted file."""

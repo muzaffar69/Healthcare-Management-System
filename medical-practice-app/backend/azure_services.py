@@ -64,6 +64,15 @@ class SecureConfig:
         self.encryption_key = self._get_or_create_key()
         self.fernet = Fernet(self.encryption_key)
         self.config = self._load_config()
+        
+        
+    def __eq__(self, other):
+        """Override equality to prevent comparison issues with PyWebView"""
+        return id(self) == id(other)
+    
+    def __hash__(self):
+        """Override hash to prevent comparison issues with PyWebView"""
+        return id(self)
     
     def _get_or_create_key(self) -> bytes:
         """Get or create encryption key for sensitive data."""
@@ -151,6 +160,15 @@ class AzureServices:
             raise ValueError(f"Invalid configuration: {', '.join(errors)}")
         
         self._initialize_clients()
+    
+    def __eq__(self, other):
+        """Override equality to prevent comparison issues with PyWebView"""
+        return id(self) == id(other)
+    
+    def __hash__(self):
+        """Override hash to prevent comparison issues with PyWebView"""
+        return id(self)
+    
     
     def _initialize_clients(self):
         """Initialize Azure clients."""
