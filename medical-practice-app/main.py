@@ -630,7 +630,7 @@ def get_html_content():
         except Exception as e:
             logger.warning(f"Failed to load HTML template files: {e}")
     
-    # Return minimal embedded HTML with no blue background
+    # Return minimal embedded HTML with nearly transparent background
     return '''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -640,23 +640,32 @@ def get_html_content():
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Minimal Dark Login Interface */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Minimal Background with Very Low Opacity */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        html {
+            background: rgba(0, 0, 0, 0.01) !important;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #0f172a !important; 
+            background: rgba(0, 0, 0, 0.01) !important; 
             color: #cbd5e1 !important; 
             line-height: 1.6; 
             min-height: 100vh;
         }
         
-        /* Simple dark background - no blue gradient */
+        /* Nearly transparent login screen */
         #login-screen {
             min-height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center;
-            background: #0f172a; 
+            background: rgba(0, 0, 0, 0.01) !important; 
             padding: 20px;
         }
         
@@ -789,7 +798,7 @@ def get_html_content():
             <div class="success-message">
                 <h2 style="margin-bottom: 1rem;">✅ Application Loaded Successfully!</h2>
                 <p>The minimal login interface is working correctly.</p>
-                <p style="margin-top: 1rem; color: #94a3b8;">No blue background, just the clean login box.</p>
+                <p style="margin-top: 1rem; color: #94a3b8;">With minimal background!</p>
             </div>
         </div>
     </div>
@@ -877,13 +886,13 @@ def main():
         # Get HTML content
         html_content = get_html_content()
         
-        # Create window with minimal styling
+        # Create window with transparent background
         window = webview.create_window(
             title='Medical Practice Management - Enhanced',
-            html=html_content,         # or a file:// URL to your index.html
+            html=html_content,
             frameless=True,
             transparent=True,
-            vibrancy=True,                  # optional on macOS
+            vibrancy=True,
             width=500,
             height=400,
             min_size=(500, 400),
