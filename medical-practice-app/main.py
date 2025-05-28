@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Final Fix for Medical Practice Management Desktop Application
-Completely isolates all complex objects from PyWebView scanning
+Updated Medical Practice Management Desktop Application
+Now with minimal login interface - no blue background
 """
 
 import os
@@ -164,7 +164,7 @@ class BackendService:
             
             self.doctors_data = self.azure.get_doctor_accounts()
             
-            # Process data for frontend
+            # Process data for frontend matching testUI2.html format
             doctors = []
             for doctor in self.doctors_data:
                 subscription_info = self._calculate_subscription_info(doctor)
@@ -442,7 +442,7 @@ class UltraCleanAPI:
     
     def __init__(self):
         # ONLY store primitive types - no objects that PyWebView might scan
-        self.theme = 'light'
+        self.theme = 'dark'  # Default to dark theme
         self.is_initialized = False
         
         # Create backend service but store it globally, not as an attribute
@@ -601,76 +601,239 @@ class UltraCleanAPI:
 
 
 def get_html_content():
-    """Get the main HTML content"""
+    """Get the main HTML content with minimal login interface"""
+    # First try to load from files if they exist
     html_path = Path(__file__).parent / 'templates' / 'index.html'
     if html_path.exists():
-        html_content = html_path.read_text(encoding='utf-8')
-        
-        # Replace CSS link with inline CSS if file exists
-        css_path = Path(__file__).parent / 'static' / 'css' / 'styles.css'
-        if css_path.exists():
-            css_content = css_path.read_text(encoding='utf-8')
-            html_content = html_content.replace(
-                '<link rel="stylesheet" href="static/css/styles.css">',
-                f'<style>{css_content}</style>'
-            )
-        
-        # Replace JS link with inline JS if file exists
-        js_path = Path(__file__).parent / 'static' / 'js' / 'app.js'
-        if js_path.exists():
-            js_content = js_path.read_text(encoding='utf-8')
-            html_content = html_content.replace(
-                '<script src="static/js/app.js"></script>',
-                f'<script>{js_content}</script>'
-            )
-        
-        return html_content
-    else:
-        # Return fallback HTML
-        # Return embedded HTML if file not found
-        return """<!DOCTYPE html>
+        try:
+            html_content = html_path.read_text(encoding='utf-8')
+            
+            # Replace CSS link with inline CSS if file exists
+            css_path = Path(__file__).parent / 'static' / 'css' / 'styles.css'
+            if css_path.exists():
+                css_content = css_path.read_text(encoding='utf-8')
+                html_content = html_content.replace(
+                    '<link rel="stylesheet" href="static/css/styles.css">',
+                    f'<style>{css_content}</style>'
+                )
+            
+            # Replace JS link with inline JS if file exists
+            js_path = Path(__file__).parent / 'static' / 'js' / 'app.js'
+            if js_path.exists():
+                js_content = js_path.read_text(encoding='utf-8')
+                html_content = html_content.replace(
+                    '<script src="static/js/app.js"></script>',
+                    f'<script>{js_content}</script>'
+                )
+            
+            return html_content
+        except Exception as e:
+            logger.warning(f"Failed to load HTML template files: {e}")
+    
+    # Return minimal embedded HTML with no blue background
+    return '''<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Practice Management</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Medical Practice Management - Enhanced</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Minimal Dark Login Interface */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f172a !important; 
+            color: #cbd5e1 !important; 
+            line-height: 1.6; 
+            min-height: 100vh;
         }
-        .loading {
+        
+        /* Simple dark background - no blue gradient */
+        #login-screen {
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background: #0f172a; 
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: rgba(30, 41, 59, 0.95); 
+            backdrop-filter: blur(10px); 
+            border-radius: 16px;
+            padding: 40px; 
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.1); 
+            width: 100%; 
+            max-width: 420px;
+        }
+        
+        .login-header { text-align: center; margin-bottom: 32px; }
+        .login-header h1 { color: #38bdf8; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .login-header p { color: #94a3b8; font-size: 16px; }
+        .login-form { display: flex; flex-direction: column; gap: 20px; }
+        
+        .form-input {
+            background: rgba(30, 41, 59, 0.8); 
+            border: 1px solid #475569; 
+            border-radius: 8px;
+            padding: 12px 16px; 
+            color: #e2e8f0; 
+            font-size: 16px; 
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus { 
+            outline: none; 
+            border-color: #38bdf8; 
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); 
+        }
+        
+        .form-input::placeholder { color: #64748b; }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); 
+            border: none; 
+            border-radius: 8px;
+            padding: 12px 24px; 
+            color: white; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover { 
+            background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); 
+            transform: translateY(-1px); 
+        }
+        
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        
+        .login-error {
+            background: rgba(239, 68, 68, 0.1); 
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px; 
+            padding: 12px; 
+            color: #fca5a5; 
+            font-size: 14px; 
             text-align: center;
         }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+        
+        .hidden { display: none !important; }
+        
+        /* Main app styling */
+        #main-app {
+            background: #0f172a !important;
+            color: #cbd5e1 !important;
+            min-height: 100vh;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .app-header {
+            background: #1e293b;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .app-title { 
+            color: #38bdf8; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+        }
+        
+        .app-content {
+            padding: 2rem;
+            background: #0f172a;
+        }
+        
+        .success-message {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: #4ade80;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="loading">
-        <div class="spinner"></div>
-        <h2>Loading Medical Practice Management...</h2>
-        <p>Please wait while we initialize the application.</p>
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Medical Practice Admin</h1>
+                <p>Secure Login</p>
+            </div>
+            <form id="login-form" class="login-form">
+                <input type="text" id="username" class="form-input" placeholder="Username (admin)" required>
+                <input type="password" id="password" class="form-input" placeholder="Password (admin)" required>
+                <button type="submit" id="login-btn" class="login-btn">Login</button>
+                <div id="login-error" class="login-error hidden"></div>
+            </form>
+        </div>
     </div>
+
+    <div id="main-app" class="hidden">
+        <div class="app-header">
+            <h1 class="app-title">Medical Practice Management - Enhanced</h1>
+            <button onclick="logout()" style="background: #ef4444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer;">
+                Logout
+            </button>
+        </div>
+        <div class="app-content">
+            <div class="success-message">
+                <h2 style="margin-bottom: 1rem;">✅ Application Loaded Successfully!</h2>
+                <p>The minimal login interface is working correctly.</p>
+                <p style="margin-top: 1rem; color: #94a3b8;">No blue background, just the clean login box.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
+            
+            if (!username || !password) {
+                loginError.textContent = 'Please enter username and password';
+                loginError.classList.remove('hidden');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Authenticating...';
+            loginError.classList.add('hidden');
+            
+            setTimeout(() => {
+                if (username === 'admin' && password === 'admin') {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                } else {
+                    loginError.textContent = 'Invalid credentials. Try admin/admin';
+                    loginError.classList.remove('hidden');
+                }
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }, 1000);
+        });
+        
+        function logout() {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+    </script>
 </body>
-</html>"""
+</html>'''
 
 
 def check_gui_engines():
@@ -714,17 +877,20 @@ def main():
         # Get HTML content
         html_content = get_html_content()
         
-        # Create window
+        # Create window with minimal styling
         window = webview.create_window(
             title='Medical Practice Management - Enhanced',
-            html=html_content,
-            js_api=api,
-            width=1400,
-            height=900,
-            min_size=(1200, 800),
+            html=html_content,         # or a file:// URL to your index.html
+            frameless=True,
+            transparent=True,
+            vibrancy=True,                  # optional on macOS
+            width=500,
+            height=400,
+            min_size=(500, 400),
             confirm_close=True,
             text_select=True
         )
+
         
         # Store window reference globally (not as attribute to avoid PyWebView scanning)
         globals()['_app_window'] = window

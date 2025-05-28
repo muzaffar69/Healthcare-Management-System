@@ -1,12 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Practice Management - Enhanced</title>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/styles.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Medical Practice Management - Enhanced (Dark Mode)</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
+        /* Medical Practice Management - Minimal Login Interface */
+        
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: transparent  !important;
+            color: #cbd5e1 !important;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        /* Animations */
+        .content-enter-animation {
+            animation: contentFadeInUp 0.5s 0.1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes contentFadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* Minimal Login Screen - No Blue Background */
+        #login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;   /* let the window show through */
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            width: 100%;
+            max-width: 420px;
+            /* Add subtle border glow for visibility */
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.1), 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-header h1 {
+            color: #38bdf8;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-input {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e2e8f0;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fca5a5;
+            font-size: 14px;
+            text-align: center;
+        }
+
         /* Tab content visibility */
         .tab-content {
             display: none;
@@ -44,25 +183,99 @@
             background: rgba(56, 189, 248, 0.1);
             color: #38bdf8;
         }
-        
-        .context-menu-item:first-child {
-            border-radius: 8px 8px 0 0;
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
-        
-        .context-menu-item:last-child {
-            border-radius: 0 0 8px 8px;
+
+        .loading-content {
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            border: 1px solid rgba(148, 163, 184, 0.1);
         }
-        
-        .context-menu-divider {
-            height: 1px;
-            background: rgba(148, 163, 184, 0.1);
-            margin: 4px 0;
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-top: 3px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #e2e8f0;
+            font-size: 16px;
+        }
+
+        /* Force dark theme colors */
+        .bg-slate-900 { background-color: #0f172a !important; }
+        .bg-slate-800 { background-color: #1e293b !important; }
+        .bg-slate-700 { background-color: #334155 !important; }
+        .text-slate-300 { color: #cbd5e1 !important; }
+        .text-slate-400 { color: #94a3b8 !important; }
+        .text-slate-500 { color: #64748b !important; }
+        .text-sky-400 { color: #38bdf8 !important; }
+        .border-slate-700 { border-color: #334155 !important; }
+        .border-slate-600 { border-color: #475569 !important; }
+
+        /* Hide utility */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Alternative minimal login styles */
+        .minimal-login {
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            backdrop-filter: none;
+        }
+
+        /* Compact login option */
+        .compact-login #login-screen {
+            padding: 10px;
+        }
+
+        .compact-login .login-container {
+            padding: 24px;
+            max-width: 360px;
+        }
+
+        .compact-login .login-header h1 {
+            font-size: 24px;
+        }
+
+        /* Borderless login option */
+        .borderless-login .login-container {
+            background: rgba(30, 41, 59, 0.7);
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="hidden">
+<body class="text-slate-300 font-sans" style="background:transparent;">
+    <!-- Minimal Login Screen -->
+    <div id="login-screen">
         <div class="login-container">
             <div class="login-header">
                 <h1>Medical Practice Admin</h1>
@@ -79,269 +292,233 @@
     </div>
 
     <!-- Main Application -->
-    <div id="main-app" class="fade-in">
+    <div id="main-app" class="min-h-screen flex flex-col hidden">
         <!-- Header -->
-        <header class="app-header">
-            <h1 class="app-title">Medical Practice Management - Enhanced</h1>
-            <div class="header-controls">
-                <button id="theme-toggle" class="header-btn">
-                    <span class="material-icons" id="theme-icon">light_mode</span>
+        <header class="bg-slate-800 shadow-md py-3 px-6 flex items-center justify-between border-b border-slate-700">
+            <h1 class="text-xl font-semibold text-sky-400">Medical Practice Management - Enhanced</h1>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="flex items-center text-sm px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-sky-400 rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-slate-500">
+                    <span class="material-icons text-base mr-1" id="theme-icon">light_mode</span>
                     <span id="theme-text">Light Theme</span>
                 </button>
-                <button id="user-menu-btn" class="header-btn user-btn">
-                    <span class="material-icons">admin_panel_settings</span>
+                <button id="user-menu-btn" class="flex items-center text-sm px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-sky-800">
+                    <span class="material-icons text-base mr-1">admin_panel_settings</span>
                     <span id="user-name">Admin</span>
                 </button>
             </div>
         </header>
 
         <!-- Toolbar -->
-        <div class="app-toolbar">
-            <div class="toolbar-left">
-                <button id="refresh-btn" class="toolbar-btn">
-                    <span class="material-icons">refresh</span>
+        <div class="bg-slate-800 py-3 px-6 flex items-center justify-between border-b border-slate-700">
+            <div class="flex items-center space-x-3">
+                <button id="refresh-btn" class="flex items-center text-sm px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-sky-700">
+                    <span class="material-icons text-lg mr-2">refresh</span>
                     Refresh
                 </button>
-                <button id="new-doctor-btn" class="toolbar-btn">
-                    <span class="material-icons">add</span>
+                <button id="new-doctor-btn" class="flex items-center text-sm px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-sky-800">
+                    <span class="material-icons text-lg mr-2">add</span>
                     New Doctor
                 </button>
-                <button id="export-btn" class="toolbar-btn secondary">
-                    <span class="material-icons">upload_file</span>
+                <button id="export-btn" class="flex items-center text-sm px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-slate-500">
+                    <span class="material-icons text-lg mr-2">upload_file</span>
                     Export
                 </button>
             </div>
-            <div class="search-container">
-                <span class="material-icons search-icon">search</span>
-                <input id="global-search" class="global-search" placeholder="Global search... (Ctrl+F)" type="text">
+            <div class="relative">
+                <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">search</span>
+                <input id="global-search" class="bg-slate-700 border border-slate-600 rounded-md py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 w-72 text-slate-300 placeholder-slate-500 transition-all duration-200 ease-in-out" placeholder="Global search... (Ctrl+F)" type="text"/>
             </div>
         </div>
 
         <!-- Navigation Tabs -->
-        <nav class="nav-tabs">
-            <a href="#" data-tab="doctors" class="tab-link active">
-                <span class="material-icons">person</span>
-                Doctors
+        <nav class="bg-slate-800 px-6 flex border-b border-slate-700">
+            <a data-tab="doctors" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-sky-400 border-b-2 border-sky-400 hover:text-sky-300 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">person</span> Doctors
             </a>
-            <a href="#" data-tab="laboratories" class="tab-link">
-                <span class="material-icons">science</span>
-                Laboratories
+            <a data-tab="laboratories" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">science</span> Laboratories
             </a>
-            <a href="#" data-tab="pharmacies" class="tab-link">
-                <span class="material-icons">local_pharmacy</span>
-                Pharmacies
+            <a data-tab="pharmacies" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">local_pharmacy</span> Pharmacies
             </a>
-            <a href="#" data-tab="subscriptions" class="tab-link">
-                <span class="material-icons">subscriptions</span>
-                Subscriptions
+            <a data-tab="subscriptions" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">subscriptions</span> Subscriptions
             </a>
-            <a href="#" data-tab="dashboard" class="tab-link">
-                <span class="material-icons">dashboard</span>
-                Dashboard
+            <a data-tab="dashboard" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">dashboard</span> Dashboard
             </a>
-            <a href="#" data-tab="settings" class="tab-link">
-                <span class="material-icons">settings</span>
-                Settings
+            <a data-tab="settings" class="tab-link flex items-center px-5 py-3 text-sm font-medium text-slate-400 hover:text-sky-400 transition-colors duration-150 ease-in-out" href="#">
+                <span class="material-icons text-xl mr-2">settings</span> Settings
             </a>
         </nav>
 
         <!-- Main Content Area -->
-        <main class="main-content">
+        <main class="flex-grow p-6">
             <!-- Doctors Tab -->
             <div id="doctors-tab" class="tab-content active">
-                <div class="content-card">
-                    <div class="card-header">
-                        <div class="control-group">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="select-all-doctors" class="checkbox">
-                                <label for="select-all-doctors">Select All</label>
-                            </div>
-                            <button id="bulk-actions-btn" class="btn-small">Bulk Actions</button>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 flex items-center justify-between border-b border-slate-700">
+                        <div class="flex items-center space-x-3">
+                            <button id="select-all-btn" class="text-sm px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-slate-500">Select All</button>
+                            <button id="bulk-actions-btn" class="text-sm px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-sky-800">Bulk Actions</button>
                         </div>
-                        <div class="card-controls">
-                            <div class="search-container">
-                                <input id="doctors-search" class="search-input" placeholder="Search..." type="text">
+                        <div class="flex items-center space-x-3">
+                            <div class="relative">
+                                <span class="material-icons absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-base">search</span>
+                                <input id="doctors-search" class="bg-slate-700 border border-slate-600 rounded-md py-2 pl-10 pr-3 text-sm w-48 focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-slate-300 placeholder-slate-500 transition-all duration-200 ease-in-out" placeholder="Search..." type="text"/>
                             </div>
-                            <select id="doctors-search-field" class="select-input">
+                            <select id="doctors-search-field" class="bg-slate-700 border border-slate-600 rounded-md py-2 px-3 text-sm focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-slate-300 transition-all duration-200 ease-in-out">
                                 <option>All Fields</option>
                                 <option>Name</option>
                                 <option>Email</option>
                                 <option>ID</option>
                                 <option>Specialty</option>
                             </select>
-                            <button id="doctors-search-btn" class="btn-small">Search</button>
-                            <button id="doctors-clear-btn" class="btn-small secondary">Clear</button>
+                            <button id="doctors-search-btn" class="text-sm px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-sky-800">Search</button>
+                            <button id="doctors-clear-btn" class="text-sm px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-slate-500">Clear</button>
+                            <button id="view-options-btn" class="text-sm px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md transition-all duration-150 ease-in-out transform active:scale-95 active:bg-slate-500">View Options</button>
                         </div>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-400">
+                            <thead class="bg-slate-700 text-xs uppercase text-sky-400">
                                 <tr>
-                                    <th></th>
-                                    <th>ID</th>
-                                    <th>NAME</th>
-                                    <th>EMAIL</th>
-                                    <th>STATUS</th>
-                                    <th>SPECIALTY</th>
-                                    <th>PHONE</th>
-                                    <th>PHARMACY</th>
-                                    <th>LABORATORY</th>
-                                    <th>SUBSCRIPTION</th>
-                                    <th>DAYS LEFT</th>
+                                    <th class="px-4 py-3" scope="col">ID</th>
+                                    <th class="px-4 py-3" scope="col">Name</th>
+                                    <th class="px-4 py-3" scope="col">Email</th>
+                                    <th class="px-4 py-3" scope="col">Status</th>
+                                    <th class="px-4 py-3" scope="col">Specialty</th>
+                                    <th class="px-4 py-3" scope="col">Phone</th>
+                                    <th class="px-4 py-3" scope="col">Pharmacy</th>
+                                    <th class="px-4 py-3" scope="col">Laboratory</th>
+                                    <th class="px-4 py-3" scope="col">Subscription</th>
+                                    <th class="px-4 py-3" scope="col">Days Left</th>
                                 </tr>
                             </thead>
                             <tbody id="doctors-table-body">
-                                <!-- Table rows will be inserted here dynamically -->
+                                <!-- Sample data -->
+                                <tr class="border-b border-slate-700 hover:bg-slate-700/50 transition-colors duration-150 ease-in-out">
+                                    <td class="px-4 py-3 text-slate-500">cd12efc0-7dc...</td>
+                                    <td class="px-4 py-3">Dr Test</td>
+                                    <td class="px-4 py-3">test2@exampl...</td>
+                                    <td class="px-4 py-3"><span class="bg-green-700 text-green-300 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Active</span></td>
+                                    <td class="px-4 py-3"></td>
+                                    <td class="px-4 py-3"></td>
+                                    <td class="px-4 py-3"><span class="text-slate-500"><span class="material-icons text-base">close</span> Inactive</span></td>
+                                    <td class="px-4 py-3">Not assigned</td>
+                                    <td class="px-4 py-3">Not Set</td>
+                                    <td class="px-4 py-3">N/A</td>
+                                </tr>
+                                <tr class="border-b border-slate-700 hover:bg-slate-700/50 transition-colors duration-150 ease-in-out">
+                                    <td class="px-4 py-3 text-slate-500">6e54d09b-281...</td>
+                                    <td class="px-4 py-3">Alawi The big</td>
+                                    <td class="px-4 py-3">brokenshower...</td>
+                                    <td class="px-4 py-3"><span class="bg-green-700 text-green-300 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">Active</span></td>
+                                    <td class="px-4 py-3">love &lt;3</td>
+                                    <td class="px-4 py-3">07769969696</td>
+                                    <td class="px-4 py-3"><span class="text-green-400"><span class="material-icons text-base">check</span> Active</span></td>
+                                    <td class="px-4 py-3"><span class="text-green-400"><span class="material-icons text-base">check</span> Active</span></td>
+                                    <td class="px-4 py-3">2025-05-26 to...</td>
+                                    <td class="px-4 py-3">362</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Laboratories Tab -->
+            <!-- Other tabs content (keeping existing structure) -->
             <div id="laboratories-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="card-header">
-                        <h2>Laboratories</h2>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 border-b border-slate-700">
+                        <h2 class="text-xl font-semibold text-slate-300">Laboratories</h2>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>NAME</th>
-                                    <th>DOCTOR ID</th>
-                                    <th>DOCTOR NAME</th>
-                                    <th>STATUS</th>
-                                    <th>ACCESS CODE</th>
-                                    <th>CREATED</th>
-                                </tr>
-                            </thead>
-                            <tbody id="labs-table-body">
-                                <!-- Table rows will be inserted here dynamically -->
-                            </tbody>
-                        </table>
+                    <div class="p-6">
+                        <p class="text-slate-400">Laboratory management interface coming soon...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Pharmacies Tab -->
             <div id="pharmacies-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="card-header">
-                        <h2>Pharmacies</h2>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 border-b border-slate-700">
+                        <h2 class="text-xl font-semibold text-slate-300">Pharmacies</h2>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>NAME</th>
-                                    <th>DOCTOR ID</th>
-                                    <th>DOCTOR NAME</th>
-                                    <th>STATUS</th>
-                                    <th>ACCESS CODE</th>
-                                    <th>CREATED</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pharmacies-table-body">
-                                <!-- Table rows will be inserted here dynamically -->
-                            </tbody>
-                        </table>
+                    <div class="p-6">
+                        <p class="text-slate-400">Pharmacy management interface coming soon...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Subscriptions Tab -->
             <div id="subscriptions-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="card-header">
-                        <div class="control-group">
-                            <button id="filter-all" class="btn-small">All</button>
-                            <button id="filter-active" class="btn-small secondary">Active</button>
-                            <button id="filter-expiring" class="btn-small secondary">Expiring Soon</button>
-                            <button id="filter-expired" class="btn-small secondary">Expired</button>
-                        </div>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 border-b border-slate-700">
+                        <h2 class="text-xl font-semibold text-slate-300">Subscriptions</h2>
                     </div>
-                    <div style="overflow-x: auto;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>NAME</th>
-                                    <th>EMAIL</th>
-                                    <th>START DATE</th>
-                                    <th>END DATE</th>
-                                    <th>DAYS LEFT</th>
-                                    <th>STATUS</th>
-                                </tr>
-                            </thead>
-                            <tbody id="subscriptions-table-body">
-                                <!-- Table rows will be inserted here dynamically -->
-                            </tbody>
-                        </table>
+                    <div class="p-6">
+                        <p class="text-slate-400">Subscription management interface coming soon...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Dashboard Tab -->
             <div id="dashboard-tab" class="tab-content">
-                <div class="stats-grid">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                     <!-- Stats Cards -->
-                    <div class="stat-card primary">
-                        <div class="stat-header">Total Doctors</div>
-                        <div class="stat-value" id="total-doctors">0</div>
-                        <div class="stat-label">Registered</div>
+                    <div class="bg-slate-800 rounded-lg shadow-xl p-6 border-l-4 border-sky-500">
+                        <div class="text-slate-400 text-sm font-semibold mb-2">Total Doctors</div>
+                        <div class="text-3xl font-bold text-sky-400" id="total-doctors">8</div>
+                        <div class="text-slate-500 text-xs">Registered</div>
                     </div>
-                    <div class="stat-card success">
-                        <div class="stat-header">Active Subscriptions</div>
-                        <div class="stat-value" id="active-subscriptions">0</div>
-                        <div class="stat-label">Current</div>
+                    <div class="bg-slate-800 rounded-lg shadow-xl p-6 border-l-4 border-green-500">
+                        <div class="text-slate-400 text-sm font-semibold mb-2">Active Subscriptions</div>
+                        <div class="text-3xl font-bold text-green-400" id="active-subscriptions">6</div>
+                        <div class="text-slate-500 text-xs">Current</div>
                     </div>
-                    <div class="stat-card warning">
-                        <div class="stat-header">Expiring Soon</div>
-                        <div class="stat-value" id="expiring-soon">0</div>
-                        <div class="stat-label">Next 30 days</div>
+                    <div class="bg-slate-800 rounded-lg shadow-xl p-6 border-l-4 border-yellow-500">
+                        <div class="text-slate-400 text-sm font-semibold mb-2">Expiring Soon</div>
+                        <div class="text-3xl font-bold text-yellow-400" id="expiring-soon">2</div>
+                        <div class="text-slate-500 text-xs">Next 30 days</div>
                     </div>
-                    <div class="stat-card danger">
-                        <div class="stat-header">Expired</div>
-                        <div class="stat-value" id="expired-subscriptions">0</div>
-                        <div class="stat-label">Total</div>
+                    <div class="bg-slate-800 rounded-lg shadow-xl p-6 border-l-4 border-red-500">
+                        <div class="text-slate-400 text-sm font-semibold mb-2">Expired</div>
+                        <div class="text-3xl font-bold text-red-400" id="expired-subscriptions">0</div>
+                        <div class="text-slate-500 text-xs">Total</div>
                     </div>
                 </div>
                 
                 <!-- Recent Activity -->
-                <div class="content-card">
-                    <div class="card-header">
-                        <h2>Recent Activity</h2>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 border-b border-slate-700">
+                        <h2 class="text-xl font-semibold text-slate-300">Recent Activity</h2>
                     </div>
-                    <div class="p-4">
-                        <div id="activity-log">
-                            <!-- Activity items will be inserted here -->
+                    <div class="p-6">
+                        <div id="activity-log" class="space-y-3">
+                            <div class="flex items-center gap-2 text-sm text-slate-400">
+                                <span class="material-icons text-base text-sky-500">info</span>
+                                <span>Application initialized successfully</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Settings Tab -->
             <div id="settings-tab" class="tab-content">
-                <div class="content-card">
-                    <div class="card-header">
-                        <h2>Settings</h2>
+                <div class="bg-slate-800 rounded-lg shadow-xl content-enter-animation">
+                    <div class="px-6 py-4 border-b border-slate-700">
+                        <h2 class="text-xl font-semibold text-slate-300">Settings</h2>
                     </div>
-                    <div class="p-4">
-                        <!-- Account Settings -->
-                        <div class="mb-4">
-                            <h3 style="color: #e2e8f0; margin-bottom: 16px;">Account Settings</h3>
-                            <button id="change-password-btn" class="toolbar-btn">
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-300 mb-4">Account Settings</h3>
+                            <button id="change-password-btn" class="flex items-center text-sm px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-md">
+                                <span class="material-icons text-lg mr-2">lock</span>
                                 Change Password
                             </button>
                         </div>
-                        
-                        <!-- Export Settings -->
-                        <div class="mb-4">
-                            <h3 style="color: #e2e8f0; margin-bottom: 16px;">Data Management</h3>
-                            <button id="export-all-btn" class="toolbar-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-300 mb-4">Data Management</h3>
+                            <button id="export-all-btn" class="flex items-center text-sm px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md">
+                                <span class="material-icons text-lg mr-2">download</span>
                                 Export All Data
                             </button>
                         </div>
@@ -351,16 +528,13 @@
         </main>
 
         <!-- Footer -->
-        <footer class="app-footer">
-            <div class="footer-left">
-                <div class="status-indicator connected">
-                    <span class="material-icons" style="font-size: 16px;">wifi</span>
-                    <span>Connected</span>
-                </div>
+        <footer class="bg-slate-800 py-3 px-6 text-xs text-slate-500 flex items-center justify-between border-t border-slate-700">
+            <div>
+                <span class="material-icons text-base text-green-500 mr-1">wifi</span> Connected
             </div>
-            <div class="footer-right">
-                <span id="session-timer">Session: 30 min</span>
-                <span id="record-count">0 records</span>
+            <div class="flex items-center space-x-4">
+                <span id="session-timer">Session: 29 min</span>
+                <span id="record-count">32 records</span>
             </div>
         </footer>
     </div>
@@ -383,7 +557,6 @@
             <span class="material-icons">edit</span>
             Edit
         </div>
-        <div class="context-menu-divider"></div>
         <div class="context-menu-item" data-action="reset-password">
             <span class="material-icons">key</span>
             Reset Password
@@ -392,7 +565,6 @@
             <span class="material-icons">toggle_on</span>
             Toggle Status
         </div>
-        <div class="context-menu-divider"></div>
         <div class="context-menu-item" data-action="export">
             <span class="material-icons">download</span>
             Export
