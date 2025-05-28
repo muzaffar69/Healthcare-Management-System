@@ -893,9 +893,9 @@ def main():
             frameless=True,
             transparent=True,
             vibrancy=True,
-            width=500,
-            height=400,
-            min_size=(500, 400),
+            width=420,
+            height=341,
+            min_size=(420, 341),
             confirm_close=True,
             text_select=True
         )
